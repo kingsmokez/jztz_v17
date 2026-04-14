@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Cache and temporary files
+*.cache
+*.log
+*.tmp
+
+# Runtime cache files
+daily_pick_cache.json
+wp2_pick_cache.json
+auction_pick_cache.json
+offline_stocks.json
+sector_codes.json
+
+# OS
+.DS_Store
+Thumbs.db
