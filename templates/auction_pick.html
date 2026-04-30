@@ -966,7 +966,7 @@
             <div class="criteria-card">
                 <h3>
                     <span class="icon">🌙</span> 第一阶段：昨晚预选
-                    <button class="btn-preselect" onclick="executePreselect()" id="preselectBtn">🎯 立即预选</button>
+                    <button class="btn-preselect" onclick="executePreselect()" id="preselectBtn" disabled>🎯 检查中...</button>
                 </h3>
                 <div class="criteria-list">
                     <div class="criteria-item">
@@ -998,7 +998,10 @@
 
             <!-- 第二阶段：竞价确认 -->
             <div class="criteria-card">
-                <h3><span class="icon">⚡</span> 第二阶段：竞价四维确认</h3>
+                <h3>
+                    <span class="icon">⚡</span> 第二阶段：竞价四维确认
+                    <button class="btn-preselect" onclick="executeAuctionConfirm()" id="confirmBtn" style="background: linear-gradient(135deg, #FF9F0A 0%, #F59E0B 100%);">⚡ 执行确认</button>
+                </h3>
                 <div class="criteria-list">
                     <div class="criteria-item">
                         <span class="bullet">①</span>
@@ -1030,6 +1033,7 @@
                     <span>📋</span>
                     <span>预选股票池</span>
                     <span class="result-time" id="poolTime">--:--</span>
+                    <span class="result-time" id="poolUpdateTime" style="font-size: 12px; color: var(--text-muted); margin-left: 8px;"></span>
                 </div>
                 <span class="badge badge-empty" id="poolBadge">等待预选</span>
             </div>
@@ -1048,6 +1052,7 @@
                     <span>🎯</span>
                     <span>竞价确认结果</span>
                     <span class="result-time" id="pickTime">--:--</span>
+                    <span class="result-time" id="confirmUpdateTime" style="font-size: 12px; color: var(--text-muted); margin-left: 8px;"></span>
                 </div>
                 <span class="badge badge-empty" id="pickBadge">等待选股</span>
             </div>
@@ -1100,6 +1105,42 @@
             document.getElementById('lastUpdate').textContent = `最后更新: ${now.toLocaleString('zh-CN')}`;
         }
 
+        // 检查预选按钮状态
+        async function checkPreselectStatus() {
+            try {
+                const resp = await fetch('/api/auction_status');
+                const status = await resp.json();
+                const btn = document.getElementById('preselectBtn');
+                
+                if (status.can_preselect) {
+                    btn.disabled = false;
+                    btn.innerHTML = '🎯 立即预选';
+                    btn.title = '点击执行第一阶段预选';
+                } else {
+                    btn.disabled = true;
+                    if (!status.in_preselect_window) {
+                        btn.innerHTML = '🎯 非预选时段';
+                        btn.title = '预选只能在 15:30~22:00 之间执行';
+                    } else if (status.preselect_done_today) {
+                        btn.innerHTML = '🎯 今日已预选';
+                        btn.title = '今天已执行过预选，无需重复执行';
+                    }
+                }
+                
+                // 更新预选时间显示
+                if (status.preselect_time) {
+                    document.getElementById('poolUpdateTime').textContent = '更新: ' + status.preselect_time;
+                }
+                if (status.confirm_time) {
+                    document.getElementById('confirmUpdateTime').textContent = '确认: ' + status.confirm_time;
+                }
+                
+                return status;
+            } catch (e) {
+                return null;
+            }
+        }
+
         // 执行预选（第一阶段）
         async function executePreselect() {
             const btn = document.getElementById('preselectBtn');
@@ -1121,8 +1162,15 @@
 
                 if (data.success) {
                     renderCandidatePool(data);
-                    const now = new Date();
-                    document.getElementById('poolTime').textContent = now.toLocaleTimeString('zh-CN');
+                    if (data.preselect_time) {
+                        document.getElementById('poolUpdateTime').textContent = '更新: ' + data.preselect_time;
+                        document.getElementById('poolTime').textContent = data.preselect_time.split(' ')[1];
+                    } else {
+                        const now = new Date();
+                        document.getElementById('poolTime').textContent = now.toLocaleTimeString('zh-CN');
+                    }
+                    // 预选成功后刷新按钮状态
+                    checkPreselectStatus();
                 } else {
                     document.getElementById('poolContent').innerHTML = `
                         <div class="empty-state">
@@ -1144,8 +1192,8 @@
                 document.getElementById('poolBadge').textContent = '请求失败';
             }
 
-            btn.disabled = false;
-            btn.innerHTML = '🎯 立即预选';
+            // 刷新按钮状态（可能因为时间限制需要保持禁用）
+            checkPreselectStatus();
         }
 
         // 渲染候选池
@@ -1289,6 +1337,60 @@
             btn.innerHTML = '🎯 执行竞价选股';
         }
 
+        // 执行第二阶段竞价确认（单独执行）
+        async function executeAuctionConfirm() {
+            const btn = document.getElementById('confirmBtn');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ 确认中...';
+
+            document.getElementById('pickContent').innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>正在执行竞价四维确认...</p>
+                </div>
+            `;
+            document.getElementById('pickBadge').className = 'badge badge-waiting';
+            document.getElementById('pickBadge').textContent = '确认中';
+
+            try {
+                const resp = await fetch('/api/auction_confirm');
+                const data = await resp.json();
+
+                if (data.success) {
+                    renderPickResults(data);
+                    showLastUpdate();
+                    updateMarketStatus(data);
+                    // 显示确认时间
+                    fetch('/api/auction_status').then(r => r.json()).then(s => {
+                        if (s.confirm_time) {
+                            document.getElementById('confirmUpdateTime').textContent = '确认: ' + s.confirm_time;
+                        }
+                    });
+                } else {
+                    document.getElementById('pickContent').innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">❌</div>
+                            <span class="text">确认失败: ${data.error || '未知错误'}</span>
+                        </div>
+                    `;
+                    document.getElementById('pickBadge').className = 'badge badge-empty';
+                    document.getElementById('pickBadge').textContent = '确认失败';
+                }
+            } catch (e) {
+                document.getElementById('pickContent').innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">❌</div>
+                        <span class="text">请求失败: ${e.message}</span>
+                    </div>
+                `;
+                document.getElementById('pickBadge').className = 'badge badge-empty';
+                document.getElementById('pickBadge').textContent = '请求失败';
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '⚡ 执行竞价确认';
+        }
+
         // 更新大盘状态
         function updateMarketStatus(data) {
             if (data.market_info) {
@@ -1414,30 +1516,47 @@
         // 页面加载时自动获取数据
         async function loadData() {
             try {
-                // 同时加载竞价选股结果和候选池数据
-                const [pickResp, preselectResp] = await Promise.all([
-                    fetch('/api/auction_pick'),
-                    fetch('/api/auction_preselect')
-                ]);
+                // 先检查按钮状态
+                checkPreselectStatus();
 
+                // 加载竞价选股结果
+                const pickResp = await fetch('/api/auction_pick');
                 const pickData = await pickResp.json();
-                const preselectData = await preselectResp.json();
 
                 if (pickData.success) {
                     renderPickResults(pickData);
                     showLastUpdate();
                     updateMarketStatus(pickData);
+                    if (pickData.preselect_time) {
+                        document.getElementById('poolUpdateTime').textContent = '更新: ' + pickData.preselect_time;
+                        document.getElementById('poolTime').textContent = pickData.preselect_time.split(' ')[1];
+                    }
+                    if (pickData.confirm_time) {
+                        document.getElementById('confirmUpdateTime').textContent = '确认: ' + pickData.confirm_time;
+                    }
                 }
 
-                if (preselectData.success) {
-                    renderCandidatePool(preselectData);
-                    const now = new Date();
-                    document.getElementById('poolTime').textContent = now.toLocaleTimeString('zh-CN');
+                // 加载候选池数据（从缓存，不触发新的预选）
+                try {
+                    const poolResp = await fetch('/api/auction_candidate_pool');
+                    const poolData = await poolResp.json();
+                    if (poolData.success && poolData.candidates && poolData.candidates.length > 0) {
+                        renderCandidatePool(poolData);
+                        if (poolData.preselect_time) {
+                            document.getElementById('poolUpdateTime').textContent = '更新: ' + poolData.preselect_time;
+                            document.getElementById('poolTime').textContent = poolData.preselect_time.split(' ')[1];
+                        }
+                    }
+                } catch(e) {
+                    console.log('加载候选池缓存失败', e);
                 }
             } catch (e) {
                 console.log('自动加载失败，等待手动触发');
             }
         }
+
+        // 每60秒刷新按钮状态
+        setInterval(checkPreselectStatus, 60000);
 
         // 页面加载完成后尝试自动获取
         loadData();

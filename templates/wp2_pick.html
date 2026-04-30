@@ -1001,7 +1001,9 @@
 
             // 更新时间
             if (data.pick_time) {
-                document.getElementById('pickTime').textContent = data.pick_time;
+                const dateStr = data.date || '';
+                const timeStr = data.pick_time;
+                document.getElementById('pickTime').textContent = dateStr ? dateStr + ' ' + timeStr : timeStr;
             }
             if (data.last_update) {
                 document.getElementById('lastUpdate').textContent = '最后更新: ' + data.last_update;

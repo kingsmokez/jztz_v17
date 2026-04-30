@@ -1,0 +1,195 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1777512048013,
+  "projectRoot": "D:\\UI\\jztz_v17",
+  "techStack": {
+    "languages": [
+      {
+        "name": "Python",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "requirements.txt"
+        ]
+      }
+    ],
+    "frameworks": [],
+    "packageManager": "pip",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs",
+      "static"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 0,
+      "lastAccessed": 1777512047976,
+      "keyFiles": []
+    },
+    "modules": {
+      "path": "modules",
+      "purpose": null,
+      "fileCount": 13,
+      "lastAccessed": 1777512047977,
+      "keyFiles": [
+        "auction_picker.py",
+        "cache_manager.py",
+        "config.py",
+        "data_fetcher.py",
+        "http_client.py"
+      ]
+    },
+    "static": {
+      "path": "static",
+      "purpose": "Static files",
+      "fileCount": 1,
+      "lastAccessed": 1777512047978,
+      "keyFiles": []
+    },
+    "templates": {
+      "path": "templates",
+      "purpose": null,
+      "fileCount": 6,
+      "lastAccessed": 1777512047979,
+      "keyFiles": [
+        "auction_pick.html",
+        "backtest_report.html",
+        "daily_pick.html",
+        "index.html",
+        "login.html"
+      ]
+    },
+    "temp_repo": {
+      "path": "temp_repo",
+      "purpose": null,
+      "fileCount": 15,
+      "lastAccessed": 1777512047979,
+      "keyFiles": [
+        "eslint.config.js",
+        "index.html",
+        "LICENSE",
+        "logo.jpg",
+        "package-lock.json"
+      ]
+    },
+    "wp2": {
+      "path": "wp2",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1777512047980,
+      "keyFiles": [
+        "server.py"
+      ]
+    },
+    "temp_repo\\node_modules": {
+      "path": "temp_repo\\node_modules",
+      "purpose": "Dependencies",
+      "fileCount": 1,
+      "lastAccessed": 1777512047985,
+      "keyFiles": []
+    },
+    "wp2\\static": {
+      "path": "wp2\\static",
+      "purpose": "Static files",
+      "fileCount": 1,
+      "lastAccessed": 1777512047985,
+      "keyFiles": [
+        "index.html"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "modules\\auction_picker.py",
+      "accessCount": 17,
+      "lastAccessed": 1777515694280,
+      "type": "file"
+    },
+    {
+      "path": "web_app.py",
+      "accessCount": 7,
+      "lastAccessed": 1777512346182,
+      "type": "file"
+    },
+    {
+      "path": "modules\\technical.py",
+      "accessCount": 5,
+      "lastAccessed": 1777515374709,
+      "type": "file"
+    },
+    {
+      "path": "",
+      "accessCount": 4,
+      "lastAccessed": 1777512296388,
+      "type": "directory"
+    },
+    {
+      "path": "templates\\auction_pick.html",
+      "accessCount": 3,
+      "lastAccessed": 1777512311809,
+      "type": "file"
+    },
+    {
+      "path": "modules\\scheduler.py",
+      "accessCount": 3,
+      "lastAccessed": 1777512322098,
+      "type": "directory"
+    },
+    {
+      "path": "modules\\wp2_picker.py",
+      "accessCount": 3,
+      "lastAccessed": 1777515320686,
+      "type": "file"
+    },
+    {
+      "path": "modules\\cache_manager.py",
+      "accessCount": 2,
+      "lastAccessed": 1777512311488,
+      "type": "directory"
+    },
+    {
+      "path": "modules\\data_fetcher.py",
+      "accessCount": 2,
+      "lastAccessed": 1777512311828,
+      "type": "file"
+    },
+    {
+      "path": "smart_stock_picker.py",
+      "accessCount": 1,
+      "lastAccessed": 1777512099923,
+      "type": "file"
+    },
+    {
+      "path": "C:\\Users\\zzh\\.claude\\plans\\parallel-meandering-moth.md",
+      "accessCount": 1,
+      "lastAccessed": 1777512526019,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

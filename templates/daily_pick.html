@@ -785,9 +785,13 @@
         <div class="header">
             <h1>🏆 中短线推荐</h1>
             <p class="subtitle">自动选股时间: 早盘 9:27 | 午盘 14:30</p>
-            <div class="nav-links">
-                <a href="/" class="btn-outline">← 返回首页</a>
-                <a href="/auction_pick" class="btn-outline" style="background:linear-gradient(135deg,#FF9F0A 0%,#F59E0B 100%);color:#fff;border-color:#FF9F0A;">⚡ 早盘竞价</a>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="runPick('morning')" id="morningBtn">
+                    ☀️ 早盘选股
+                </button>
+                <button class="btn btn-outline" onclick="runPick('afternoon')" id="afternoonBtn">
+                    🌅 午盘选股
+                </button>
             </div>
             <p class="refresh-info" id="lastUpdate"></p>
         </div>
@@ -910,7 +914,7 @@
                         <div class="rank ${rankClass}">${idx + 1}</div>
                         <div class="stock-info">
                             <div class="name">${stock.name}</div>
-                            <div class="code">${stock.code}</div>
+                            <div class="code">${stock.code}${stock.industry ? ' · ' + stock.industry : ''}</div>
                         </div>
                         <div class="price">${stock.price?.toFixed(2) || '--'}</div>
                         <div class="change" style="color:${changeColor}">${changeSign}${(stock.change_pct || 0).toFixed(2)}%</div>
@@ -1142,7 +1146,7 @@
                     <div class="stock-detail-header">
                         <div class="stock-detail-title">
                             <div class="stock-detail-name">${s.name || '未知'}</div>
-                            <div class="stock-detail-code">${s.code || code}</div>
+                            <div class="stock-detail-code">${s.code || code}${s.industry ? ' · ' + s.industry : ''}</div>
                             <div class="stock-detail-price">
                                 <span class="price">${(s.price || 0).toFixed(2)}</span>
                                 <span class="change" style="color:${changeColor}">${changeSign}${(s.change_pct || 0).toFixed(2)}%</span>
@@ -1279,6 +1283,41 @@
                 closeStockDetail();
             }
         });
+
+        // 手动执行选股
+        async function runPick(sessionType) {
+            const btn = document.getElementById(sessionType + 'Btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ 选股中...';
+            btn.disabled = true;
+
+            try {
+                const resp = await fetch('/api/daily_pick_run', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_type: sessionType })
+                });
+                const data = await resp.json();
+
+                if (data.success) {
+                    btn.innerHTML = '✅ ' + (sessionType === 'morning' ? '早盘' : '午盘') + '完成';
+                    // 刷新数据
+                    setTimeout(() => {
+                        loadData();
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }, 2000);
+                } else {
+                    alert('选股失败: ' + data.error);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                alert('网络错误: ' + e.message);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
 
         // 页面加载时获取数据
         loadData();

@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"netstat -ano | findstr 5559\",\"description\":\"确认端口5559已释放\"}",
+  "error": "Exit code 1",
+  "timestamp": "2026-04-27T00:40:11.130Z",
+  "retry_count": 2
+}

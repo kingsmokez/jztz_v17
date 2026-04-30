@@ -2275,6 +2275,7 @@
             <a class="nav-link" href="/daily_pick" target="_blank" style="background:var(--accent);color:#fff;font-weight:700;border-radius:0;">中短线推荐</a>
             <a class="nav-link" href="/auction_pick" target="_blank" style="background:linear-gradient(135deg,#FF9F0A 0%,#F59E0B 100%);color:#fff;font-weight:700;border-radius:0;">⚡ 早盘竞价</a>
             <a class="nav-link" href="/wp2_pick" target="_blank" style="background:linear-gradient(135deg,#8B5CF6 0%,#6366F1 100%);color:#fff;font-weight:700;border-radius:0;">📈 尾盘强势股</a>
+            <a class="nav-link" href="https://52etf.site/" target="_blank" style="background:linear-gradient(135deg,#FF6B6B 0%,#EE5A6F 100%);color:#fff;font-weight:700;border-radius:0;">🔥 板块热力图</a>
         </div>
         <div class="nav-time" id="navTime"></div>
     </nav>
@@ -2358,6 +2359,7 @@
             <button class="tab" onclick="window.open('/daily_pick','_blank')" style="background:var(--accent);color:#fff;border-radius:0;">中短线推荐</button>
             <button class="tab" onclick="window.open('/auction_pick','_blank')" style="background:linear-gradient(135deg,#FF9F0A 0%,#F59E0B 100%);color:#fff;border-radius:0;">⚡ 早盘集合竞价</button>
             <button class="tab" onclick="window.open('/wp2_pick','_blank')" style="background:linear-gradient(135deg,#8B5CF6 0%,#6366F1 100%);color:#fff;border-radius:0;">📈 尾盘强势股</button>
+            <button class="tab" onclick="window.open('https://52etf.site/','_blank')" style="background:linear-gradient(135deg,#FF6B6B 0%,#EE5A6F 100%);color:#fff;border-radius:0;">🔥 板块热力图</button>
         </div>
 
         <!-- 选股结果 -->
@@ -2997,12 +2999,13 @@
                     </div>`;
 
                 if (stock.buy_sell) {
+                    const buyReason = stock.buy_sell.buy_reason || '基于技术指标';
                     html += `
                     <div class="trade-points">
                         <div class="trade-point buy">
                             <div class="trade-label">买入参考价</div>
                             <div class="trade-value">${stock.buy_sell.buy.toFixed(2)}</div>
-                            <div class="trade-hint">↓${stock.buy_sell.downside.toFixed(1)}% 回调介入</div>
+                            <div class="trade-hint">↓${stock.buy_sell.downside.toFixed(1)}% ${buyReason}</div>
                         </div>
                         <div class="trade-point sell">
                             <div class="trade-label">目标卖出价</div>

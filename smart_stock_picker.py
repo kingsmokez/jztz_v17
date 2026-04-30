@@ -117,7 +117,7 @@ def get_realtime_quotes():
                         "debt_ratio": 0,
                         "rev_yoy": float(item.get("f24", 0)) if item.get("f24", 0) and item.get("f24", 0) != "-" else 0,
                         "profit_yoy": float(item.get("f25", 0)) if item.get("f25", 0) and item.get("f25", 0) != "-" else 0,
-                        "market_cap": float(item.get("f20", 0)) if item.get("f20", 0) > 0 else 0,
+                        "market_cap": float(item.get("f20", 0)) / 100000000 if item.get("f20", 0) > 0 else 0,  # f20单位是元，转亿元
                     }
 
                     # 过滤ST股和无效数据
@@ -139,35 +139,36 @@ def get_financial_data_batch(codes):
     print(f"\n📊 使用五维价值评估模型筛选...")
 
     # 预设高质量中小盘股票财务数据（符合价值投资标准）
+    # market_cap 单位：亿元
     preset_financials = {
         # 医疗健康
-        "300015": {"name": "爱尔眼科", "price": 28.5, "pe": 65.2, "roe": 22.5, "gross_margin": 48.5, "net_margin": 18.2, "rev_growth": 25.5, "profit_growth": 32.5, "pb": 12.5, "market_cap": 25000000000},
-        "300760": {"name": "迈瑞医疗", "price": 298.0, "pe": 45.2, "roe": 32.5, "gross_margin": 85.5, "net_margin": 35.2, "rev_growth": 22.5, "profit_growth": 28.5, "pb": 15.2, "market_cap": 350000000000},
-        "300122": {"name": "智飞生物", "price": 85.5, "pe": 18.5, "roe": 35.2, "gross_margin": 45.2, "net_margin": 32.5, "rev_growth": 28.5, "profit_growth": 38.5, "pb": 8.2, "market_cap": 120000000000},
-        "002007": {"name": "华兰生物", "price": 25.8, "pe": 35.2, "roe": 22.5, "gross_margin": 65.5, "net_margin": 35.2, "rev_growth": 18.5, "profit_growth": 22.5, "pb": 5.8, "market_cap": 45000000000},
+        "300015": {"name": "爱尔眼科", "price": 28.5, "pe": 65.2, "roe": 22.5, "gross_margin": 48.5, "net_margin": 18.2, "rev_growth": 25.5, "profit_growth": 32.5, "pb": 12.5, "market_cap": 250},
+        "300760": {"name": "迈瑞医疗", "price": 298.0, "pe": 45.2, "roe": 32.5, "gross_margin": 85.5, "net_margin": 35.2, "rev_growth": 22.5, "profit_growth": 28.5, "pb": 15.2, "market_cap": 3500},
+        "300122": {"name": "智飞生物", "price": 85.5, "pe": 18.5, "roe": 35.2, "gross_margin": 45.2, "net_margin": 32.5, "rev_growth": 28.5, "profit_growth": 38.5, "pb": 8.2, "market_cap": 1200},
+        "002007": {"name": "华兰生物", "price": 25.8, "pe": 35.2, "roe": 22.5, "gross_margin": 65.5, "net_margin": 35.2, "rev_growth": 18.5, "profit_growth": 22.5, "pb": 5.8, "market_cap": 450},
 
         # 消费电子/科技
-        "300059": {"name": "东方财富", "price": 22.8, "pe": 45.8, "roe": 18.5, "gross_margin": 65.2, "net_margin": 65.2, "rev_growth": 35.2, "profit_growth": 42.5, "pb": 5.2, "market_cap": 280000000000},
-        "002049": {"name": "紫光国微", "price": 168.5, "pe": 55.8, "roe": 28.5, "gross_margin": 52.5, "net_margin": 35.2, "rev_growth": 35.8, "profit_growth": 42.5, "pb": 12.5, "market_cap": 120000000000},
-        "002236": {"name": "大华股份", "price": 18.2, "pe": 22.5, "roe": 18.2, "gross_margin": 42.5, "net_margin": 15.8, "rev_growth": 15.2, "profit_growth": 18.5, "pb": 3.2, "market_cap": 55000000000},
+        "300059": {"name": "东方财富", "price": 22.8, "pe": 45.8, "roe": 18.5, "gross_margin": 65.2, "net_margin": 65.2, "rev_growth": 35.2, "profit_growth": 42.5, "pb": 5.2, "market_cap": 2800},
+        "002049": {"name": "紫光国微", "price": 168.5, "pe": 55.8, "roe": 28.5, "gross_margin": 52.5, "net_margin": 35.2, "rev_growth": 35.8, "profit_growth": 42.5, "pb": 12.5, "market_cap": 1200},
+        "002236": {"name": "大华股份", "price": 18.2, "pe": 22.5, "roe": 18.2, "gross_margin": 42.5, "net_margin": 15.8, "rev_growth": 15.2, "profit_growth": 18.5, "pb": 3.2, "market_cap": 550},
 
         # 新能源/光伏
-        "300274": {"name": "阳光电源", "price": 125.8, "pe": 35.2, "roe": 22.5, "gross_margin": 28.5, "net_margin": 15.8, "rev_growth": 45.2, "profit_growth": 55.8, "pb": 8.5, "market_cap": 180000000000},
-        "002812": {"name": "恩捷股份", "price": 68.5, "pe": 28.5, "roe": 22.5, "gross_margin": 45.8, "net_margin": 32.5, "rev_growth": 55.2, "profit_growth": 65.8, "pb": 6.8, "market_cap": 58000000000},
-        "300014": {"name": "亿纬锂能", "price": 85.2, "pe": 32.5, "roe": 20.5, "gross_margin": 22.5, "net_margin": 18.5, "rev_growth": 65.8, "profit_growth": 75.2, "pb": 7.2, "market_cap": 150000000000},
+        "300274": {"name": "阳光电源", "price": 125.8, "pe": 35.2, "roe": 22.5, "gross_margin": 28.5, "net_margin": 15.8, "rev_growth": 45.2, "profit_growth": 55.8, "pb": 8.5, "market_cap": 1800},
+        "002812": {"name": "恩捷股份", "price": 68.5, "pe": 28.5, "roe": 22.5, "gross_margin": 45.8, "net_margin": 32.5, "rev_growth": 55.2, "profit_growth": 65.8, "pb": 6.8, "market_cap": 580},
+        "300014": {"name": "亿纬锂能", "price": 85.2, "pe": 32.5, "roe": 20.5, "gross_margin": 22.5, "net_margin": 18.5, "rev_growth": 65.8, "profit_growth": 75.2, "pb": 7.2, "market_cap": 1500},
 
         # 传媒/互联网
-        "002027": {"name": "分众传媒", "price": 8.5, "pe": 28.5, "roe": 25.8, "gross_margin": 65.8, "net_margin": 42.5, "rev_growth": 18.5, "profit_growth": 25.2, "pb": 4.8, "market_cap": 120000000000},
+        "002027": {"name": "分众传媒", "price": 8.5, "pe": 28.5, "roe": 25.8, "gross_margin": 65.8, "net_margin": 42.5, "rev_growth": 18.5, "profit_growth": 25.2, "pb": 4.8, "market_cap": 1200},
 
         # 化工/材料
-        "002371": {"name": "北方华创", "price": 365.0, "pe": 65.5, "roe": 25.8, "gross_margin": 35.2, "net_margin": 18.5, "rev_growth": 35.8, "profit_growth": 45.2, "pb": 10.5, "market_cap": 180000000000},
-        "300751": {"name": "迈为股份", "price": 185.0, "pe": 45.2, "roe": 28.5, "gross_margin": 72.5, "net_margin": 35.8, "rev_growth": 55.2, "profit_growth": 65.8, "pb": 12.5, "market_cap": 95000000000},
+        "002371": {"name": "北方华创", "price": 365.0, "pe": 65.5, "roe": 25.8, "gross_margin": 35.2, "net_margin": 18.5, "rev_growth": 35.8, "profit_growth": 45.2, "pb": 10.5, "market_cap": 1800},
+        "300751": {"name": "迈为股份", "price": 185.0, "pe": 45.2, "roe": 28.5, "gross_margin": 72.5, "net_margin": 35.8, "rev_growth": 55.2, "profit_growth": 65.8, "pb": 12.5, "market_cap": 950},
 
         # 物流
-        "002352": {"name": "顺丰控股", "price": 42.5, "pe": 35.8, "roe": 12.5, "gross_margin": 18.5, "net_margin": 5.2, "rev_growth": 28.5, "profit_growth": 35.8, "pb": 3.8, "market_cap": 185000000000},
+        "002352": {"name": "顺丰控股", "price": 42.5, "pe": 35.8, "roe": 12.5, "gross_margin": 18.5, "net_margin": 5.2, "rev_growth": 28.5, "profit_growth": 35.8, "pb": 3.8, "market_cap": 1850},
 
         # 食品/消费（不含白酒）
-        "603288": {"name": "海天味业", "price": 58.5, "pe": 45.8, "roe": 32.5, "gross_margin": 38.5, "net_margin": 28.5, "rev_growth": 15.2, "profit_growth": 18.5, "pb": 12.5, "market_cap": 250000000000},
+        "603288": {"name": "海天味业", "price": 58.5, "pe": 45.8, "roe": 32.5, "gross_margin": 38.5, "net_margin": 28.5, "rev_growth": 15.2, "profit_growth": 18.5, "pb": 12.5, "market_cap": 2500},
     }
 
     return preset_financials
@@ -339,7 +340,7 @@ def get_full_market_stocks():
                 except: amount_wan = 0
                 price_data[code] = {
                     'price': price, 'change_pct': change_pct,
-                    'pe': pe, 'market_cap': total_cap_yi * 100000000,
+                    'pe': pe, 'market_cap': total_cap_yi,  # 腾讯API parts[44]已是亿元单位
                     'amount': amount_wan * 10000,
                 }
         except:
